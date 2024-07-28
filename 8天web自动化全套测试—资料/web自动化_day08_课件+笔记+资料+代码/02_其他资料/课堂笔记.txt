@@ -1,0 +1,160 @@
+今日目标：
+	1. 日志 【核心目标】
+	2. 项目
+
+一、日志
+	1.1 什么是日志
+		说明：记录系统运行程序一些步骤，对一个事件(点击事件)也称为日志(Log)
+	1.2 特点
+		1. 调试程序
+		2. 定位跟踪bug
+		3. 根据日志，查看系统运行是否出错；
+		4. 分析用户行为，与数据统计
+	1.3 级别
+		1. debug # 调试级别
+		2. info  # 信息级别
+		3. warning # 警告
+		4. error # 错误级别
+		5. critical # 严重
+		
+		提示：
+			1. 开发常用以上 debug、info、warning、error
+			2. 测试常用级别：info、error
+	1.4 Logging基本使用
+		步骤：
+			1. 导包  如：import logging
+			2. 调用相应的级别方法，记录日志信息 logging.debug("debug...")
+		设置级别：
+			logging.basicConfig(level=logging.DEBUG)
+		提示：
+			1. 默认级别为：logging.WARNING
+			2. 设置级别时调用的是logging文件夹下面的常量，而不是调用的小写方法
+			3. 切记：设置级别以后，日志信息只会记录大于等于此级别的信息；
+		
+		设置格式
+			fm = "%(asctime)s %(levelname)s [%(name)s] [%(filename)s (%(funcName)s:%(lineno)d] - %(message)s"
+			logging.basicConfig(level=logging.DEBUG, format=fm)
+		
+		设置输入到文件
+			logging.basicConfig(level=logging.DEBUG, format=fm, filename="../log/log01.log")
+			
+	1.5 logging 高级用法
+		1). 为什么要使用高阶用法？？？
+			1. 中文乱码
+			2. 无法同时输入到文件和控制台
+		2). logging组成
+			1. Logger 日志器
+			2. handler 处理器
+			3. formatter 格式器
+			4. filter 过滤器
+		3). 模块关系
+			日志器：提供了，记录日志的入口，如：log.info("")
+			处理器：真正将日志器内容发送到控制台还是文件或网络，都是处理器干的；每个日志器都可以添加多个不同的处理器
+			格式器：处理器可以设置不同的格式，就需要使用格式器
+			过滤器：处理器需要过滤日志信息，就需要设置过滤器；
+			
+		日志器： 
+			操作：
+				1. 导包 import logging
+				2. 调用方法获取logger对象 # 如： logging.getlogger()
+				3. 设置级别：logger.setlevel=logging.INFO
+				4. 调用添加处理器方法 logger.addHandler(处理器)
+				
+		处理器： 
+			类型： 
+				1. 控制台处理器 StreamHandler()
+				2. 文件处理器 fileHandler() # 文件无限增大
+				3. 根据大小切割 RotatingFileHandler() 了解
+				4. 根据时间切割 TimedRotatingFileHandler() 掌握
+			
+			获取：
+				sf = logging.StreamHandler()
+				
+			TimedRotatingFileHandler()应用： 
+				1. 导包： import logging.handlers
+				2. 实例化：th = logging.handers.TimedRotatingFileHandler(filename="日志文件保存的目录及文件名",
+																		when='M',
+																		interval="1",
+																		backupcount=30)
+					1). when：时间单位
+					2). interval:时间间隔
+					3). backupcount:保留的备份数量
+		格式器：
+			获取： 
+				fmt = "%(asctime)s %(levelname)s [%(name)s] [%(filename)s (%(funcName)s:%(lineno)d] - %(message)s"
+				fm = logging.Formatter(fmt)
+				
+			将格式器添加到处理器中
+				控制台处理器.setFormatter(fm)
+				文件处理器.setFormatter(fm)
+				
+		应用：
+			logger.info("日志信息")
+			logger.error("日志信息")
+			
+		日志封装
+			# 定义获取日之类
+				# 定义类属性 logger = None
+				
+				@classemethod
+				# 定义获取logger日志器的类方法
+					if cls.logger is None: # 判断类属性logger是否还是为空，如果为空，就执行以下操作
+						# 获取 日志器对象
+						# 设置日志器级别
+						# 获取控制台处理器
+						# 获取文件处理器
+						# 获取格式器
+						# 将格式器添加到处理器中
+						# 将处理器添加到日志器中
+					return 类属性logger
+					
+				注意：
+					1. 以上条件无论是否成立，最后都会返回类属性logger;
+					2. 当第一次调用时，条件一定成立，将类属性logger设置不为空；
+					3. 当第二次以上调用时，永远返回第一次设置的类属性对象；
+					
+					
+二、项目
+	2.1 自动化测试流程
+		1. 将功能用例转化自动化用例(在功能用例模板新增一列 是否自动化 )
+		2. 搭建自动化测试环境(本机依赖的环境：python、pycharm、浏览器、浏览器驱动、selenium、 parameterized)
+		3. 搭建自动化框架(po模式+数据驱动+log+报告)
+		4. 编写代码
+		5. 执行用例
+		6. 生成报告\分析log
+		
+	2.2 自动化涉及的模块
+		1. 登录
+		2. 购物车
+		3. 订单
+		4. 支付
+		
+	2.3 自动化测试结构
+		1. base（基类）
+		2. page（页面对象）
+		3. scripts（业务脚本）
+		4. tool（工具类）
+		5. data（存储测试数据文件）
+		6. log（日志）
+		7. image（失败截图）
+		8. report（测试报告）
+		
+	2.4 base 公共方法封装实现
+		# 查找元素方法
+		# 点击元素方法
+		# 输入元素方法
+		# 获取元素文本方法
+		# 截图方法
+		# 判断元素是否存在方法封装
+		
+	2.5 登录分析
+		0. 正确用户名+正确密码+正确验证码 预期：登录成功 并跳转到个人主页；
+		1. 用户名为空 + 正确密码 + 正确验证码 预期：用户名不能空! 
+		2. 正确用户名 + 空密码 + 正确验证码 预期：密码不能为空!
+		3. 正确用户名 + 正确密码 + 空验证码  预期：验证码不能为空!
+		4. 用户名不存在 + 正确密码 + 正确验证码 预期：账号不存在!
+		5. 用户名格式不正确 + 正确密码 + 正确验证码 预期：账号格式不匹配!
+		6. 正确用户名 + 错误密码 + 正确验证码 预期：密码错误!
+		7. 正确用户名 + 正确密码 + 错误验证码 预期：验证码错误!
+		
+		

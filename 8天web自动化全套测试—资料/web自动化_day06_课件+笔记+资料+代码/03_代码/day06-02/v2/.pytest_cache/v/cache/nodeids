@@ -1,0 +1,4 @@
+[
+  "test_login.py::TestLogin::test_login_password_err",
+  "test_login.py::TestLogin::test_login_username_not_exist"
+]

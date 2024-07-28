@@ -1,0 +1,139 @@
+一、今日目标：
+	1.1 下拉选择框
+	1.2 弹出框
+	1.3 滚动条操作
+	1.4 frame表单切换
+	1.5 多窗口切换
+	1.6 窗口截图、验证码处理
+	
+一、下拉框
+	1.1 为什么单独使用下拉框？
+		1. 如果option选项没有value值的化，css定位或其他定位就不太方便。
+	1.2 如何使用Select类
+		操作：
+			1. 导包：from  selenium.webdriver.support.select improt Select
+			2. 实例化：s = Select(element)
+			3. 调用方法：s.select_by_index()
+	1.3 提供哪些方法
+			1. select_by_index() # 通过下标定位
+			2. select_by_value() # 通过value值
+			3. select_by_visible_text() #显示文本
+	
+	1.4 注意事项
+			1. 实例化select时，需要的参数为 select标签元素
+			2. 调用Select类下面的方法，是通过索引、value属性值、显示文本去控制，而不需要click事件
+			
+二、警告框
+	2.1 为什么要处理警告框？
+		如果页面由弹出框，不处理，接下来的将不生效。
+	2.2 对话框类型
+		1. alert # 警告框
+		2. confirm # 确认框
+		3. prompt # 提示框
+	
+	2.3 如何处理
+		以上三种对话框，处理方法都一样。
+		步骤：
+			1. 切换到对话框
+					方法：driver.switch_to.alert
+			2. 处理对话框
+					alert.text # 获取文本
+					alert.accept() # 同意
+					alert.dismiss() # 取消
+					
+		提示：无论以上哪个对话框，都可以使用取消、同意，因为调用的是后台的事件，根页面显示的按钮数量无关。
+		
+	2.4 注意： 
+		1. driver.switch_to.alert 方法适合以上三种类型对话框，调用时没有括号
+		2. 获取文本的方法，调用时没有括号 如：alert.text
+		3. 在项目中不是所有的小窗口都是以上三种对话框。
+		
+三、滚动条
+	3.1 为什么要操作滚动条
+		在web自动化中有些特殊场景，如：滚动条拉倒最底层，指定按钮才可用。
+	3.2 如何操作 
+		第一步：设置操作滚动条操作语句
+			如：js = "window.scrollTo(0,10000)"
+				0: 左边距 --》水平滚动条
+				10000：上边距 -->垂直滚动条
+		
+		第二步：调用执行js方法，将设置js语句传入方法中
+			方法：driver.execute_script(js)
+	3.3 说明
+			在selenium中没有直接提供定位滚动条组件方法，但是它提供了执行js语句方法，可以通过js语句来控制滚动条操作。
+			
+四、切换frame表单
+	提示：常用的frame表单有两种：frame、iframe
+	
+	4.1 为什么要切换？
+		当前主目录内没有iframe表单页面元素信息，不切换，找不到元素。
+	4.2 如何切换？
+		方法：driver.switch_to.frame("id\name\element")
+	4.3 为什么要回到主目录
+		iframe或frame只有在主目录才有相关元素信息，不回到主目录，切换语句会报错。
+	4.4 如何回到主目录
+		方法：driver.switch_to.default_content()
+	4.5 提示： 
+		1.切换frame时，可以使用name、id、iframe元素
+		
+五、多窗口切换
+	5.1 为什么要切换多窗口？
+		页面存在多个窗口式，seleniu默认焦点只会在主窗口上所有的元素，不切换切换窗口，无法操作除主窗口以外的窗口内元素
+	5.2 如何切换？
+		思路：获取要切换的窗口句柄，调用切换方法进行切换。
+		方法： 
+			1. driver.current_window_handle # 获取当前主窗口句柄
+			2. driver.window_handles # 获取当前由driver启动所有窗口句柄
+			3. driver.switch_to.window(handle) # 切换窗口
+		步骤： 
+			1. 获取当前窗口句柄 
+			2. 点击链接 启动另一个窗口
+			3. 获取当前所有窗口句柄
+			4. 遍历所有窗口句柄
+				5. 判断当前遍历的窗口句柄不等于当前窗口句柄
+				6. 切换窗口操作
+		
+六、截屏
+	应用场景：失败截图，让错误看的更直观
+	方法： 
+		driver.get_screenshot_as_file(imgepath)
+	参数：
+		imagepath：为图片要保存的目录地址及文件名称
+			如： 当前目录 ./test.png
+				 上一级目录 ../test.png
+	扩展：
+		1. 多条用例执行失败，会产生多张图片，可以采用时间戳的形式，进去区分。
+		操作： 
+			driver.get_screenshot_as_file("../image/%s.png"%(time.strftime("%Y_%m_%d %H_%M_%S")))
+			strftime:将时间转为字符串函数
+	注意：
+		%Y_%m_%d %H_%M_%S：代表，年 月 日 时 分 秒
+七、验证码
+	7.1 什么是验证码？
+		一种随机生成信息(文字、数字、图片)
+	7.2 验证码作用
+		防止恶意请求
+	
+	7.3 验证码处理方式
+		1. 去掉验证码(项目在测试环境、公司自己的项目)
+		2. 设置万能验证码(测试环境或线上环境，公司自己项目)
+		3. 使用验证码识别技术 (由于现在的验证码千奇百怪，导致识别率太低)
+		4. 使用cookie解决(推荐)
+		
+	7.4 cookie 介绍：
+		生成：由服务器生成
+		作用：标识一次对话的状态(登录的状态)
+		使用：浏览器自动记录cookie,在下一条请求时将cookis信息自动附加请求
+		
+	7.5 应用：
+		方法： 
+			1. driver.get_cookies() # 获取所有的cookie
+			2. driver.add_cookies({字典}) # 设置cookie
+		步骤： 
+			1. 打开百度url driver.get("http://www.baidu.com")
+			2. 设置cookie信息： driver.add_cookie({"name":"BDUSS","value":"根据实际情况编写"})
+			3. 暂停2秒以上
+			4. 刷新操作 
+		注意： 
+			1. 以上百度BDUSS所需格式为百度网站特有，别的网站请自行测试。
+			2. 必须进行刷新操作。
